@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synapse.ai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    /* Configure Tailwind class-based dark mode & prevent flash */
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {} }
+    };
+    if (localStorage.getItem('synapse_theme') === 'dark' || (!localStorage.getItem('synapse_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+  <style>
+    /* ── Core Typography System & Font Rendering ── */
+    html {
+      scroll-behavior: smooth;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #F5F7FA 0%, #EAEFF7 50%, #E3EAF5 100%);
+      color: #1D1D1F;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .dark body {
+      background: linear-gradient(135deg, #0B0F19 0%, #111827 50%, #0F172A 100%) !important;
+      color: #F8FAFC !important;
+    }
+
+    /* ── Smoothness Touches (Typography & Interactive Elements) ── */
+    a, button, input, textarea, select, .view-plan-btn, .delete-plan-btn {
+      transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    /* ── Brand Wordmark & Tagline ── */
+    .brand-wordmark {
+      font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.035em;
+      background: linear-gradient(135deg, #4338CA 0%, #7C3AED 55%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+    }
+
+    .dark .brand-wordmark {
+      background: linear-gradient(135deg, #818CF8 0%, #A78BFA 55%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tagline {
+      font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #6366F1;
+      opacity: 0.92;
+    }
+
+    .dark .brand-tagline {
+      color: #A78BFA;
+    }
+
+    /* ── Section Header Type Scale ── */
+    section h2, .section-title {
+      font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 700 !important;
+      color: #1E1B4B !important;
+      letter-spacing: -0.015em !important;
+    }
+
+    .dark section h2, .dark .section-title {
+      color: #E2E8F0 !important;
+    }
+
+    /* ── Background Floating Orbs Animations ── */
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.06); }
+    }
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-45px, 35px) scale(0.95); }
+    }
+    @keyframes orbFloat3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(35px, -40px) scale(1.05); }
+    }
+    .orb-float-1 { animation: orbFloat1 18s ease-in-out infinite; }
+    .orb-float-2 { animation: orbFloat2 22s ease-in-out infinite; }
+    .orb-float-3 { animation: orbFloat3 20s ease-in-out infinite; }
+
+    /* ── Card Entrance Animations ── */
+    @keyframes cardSlideUp {
+      0% { opacity: 0; transform: translateY(28px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-card-1 { animation: cardSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+    .animate-card-2 { animation: cardSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+    .animate-card-3 { animation: cardSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both; }
+
+    /* ── Loading State & Top Progress Bar Animations ── */
+    @keyframes pulseDot {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+      40% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px rgba(124, 58, 237, 0.45); }
+    }
+    .pulse-dot { animation: pulseDot 1.4s infinite ease-in-out both; }
+    
+    @keyframes topProgress {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0%); }
+    }
+    .top-progress-bar { animation: topProgress 2s linear infinite; }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer-bg {
+      background: linear-gradient(90deg, rgba(226, 232, 240, 0.4) 25%, rgba(99, 102, 241, 0.18) 50%, rgba(226, 232, 240, 0.4) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2.2s infinite linear;
+    }
+
+    .dark .shimmer-bg {
+      background: linear-gradient(90deg, rgba(51, 65, 85, 0.4) 25%, rgba(129, 140, 248, 0.25) 50%, rgba(51, 65, 85, 0.4) 75%);
+    }
+
+    /* ── #planOutput & #dashboardList Injected Items Overrides ── */
+    @keyframes contentFadeIn {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    #planOutput > div {
+      animation: contentFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Restyle app.js injected cards inside planOutput to look like Apple glass UI */
+    #planOutput > div > .bg-white {
+      background: rgba(255, 255, 255, 0.65) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.8) !important;
+      border-radius: 1.5rem !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+      padding: 1.35rem 1.6rem !important;
+      margin-bottom: 1rem !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .dark #planOutput > div > .bg-white {
+      background: rgba(30, 41, 59, 0.65) !important;
+      border-color: rgba(71, 85, 105, 0.6) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+      color: #E2E8F0 !important;
+    }
+
+    #planOutput > div > .bg-white:hover {
+      background: rgba(255, 255, 255, 0.82) !important;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+      transform: translateY(-2px);
+    }
+
+    .dark #planOutput > div > .bg-white:hover {
+      background: rgba(30, 41, 59, 0.85) !important;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Card Titles Inside Plan Output */
+    #planOutput h3 {
+      font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: 1.06rem !important;
+      font-weight: 700 !important;
+      color: #1E1B4B !important;
+      letter-spacing: -0.01em !important;
+      margin-bottom: 0.65rem !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .dark #planOutput h3 {
+      color: #E2E8F0 !important;
+    }
+
+    #planOutput h3::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 16px;
+      background: linear-gradient(180deg, #4F46E5, #06B6D4);
+      border-radius: 9999px;
+      margin-right: 0.55rem;
+    }
+
+    .dark #planOutput h3::before {
+      background: linear-gradient(180deg, #818CF8, #38BDF8);
+    }
+
+    /* Muted soft accent & Typography readability overrides for text in planOutput */
+    #planOutput .text-\\[\\#7B5FFF\\],
+    #planOutput ol li span:first-child {
+      color: #6366F1 !important;
+      font-weight: 600 !important;
+      font-family: 'Manrope', sans-serif !important;
+    }
+
+    .dark #planOutput .text-\\[\\#7B5FFF\\],
+    .dark #planOutput ol li span:first-child {
+      color: #818CF8 !important;
+    }
+    
+    #planOutput .text-\\[\\#1B1035\\] { 
+      color: #1E1B4B !important; 
+      font-weight: 600 !important; 
+      font-family: 'Manrope', sans-serif !important;
+    }
+
+    .dark #planOutput .text-\\[\\#1B1035\\] {
+      color: #F8FAFC !important;
+    }
+    
+    #planOutput .text-gray-700,
+    #planOutput p,
+    #planOutput li { 
+      color: #334155 ; 
+      line-height: 1.75 !important;
+      font-family: 'Manrope', sans-serif !important;
+      font-weight: 400 !important;
+    }
+
+    .dark #planOutput .text-gray-700,
+    .dark #planOutput p,
+    .dark #planOutput li {
+      color: #CBD5E1 ;
+    }
+
+    #planOutput .font-medium, #dashboardList .font-medium {
+      font-weight: 600 !important;
+      font-family: 'Manrope', sans-serif !important;
+    }
+
+    #dashboardList .text-\\[\\#1B1035\\] {
+      color: #1E1B4B !important;
+    }
+
+    .dark #dashboardList .text-\\[\\#1B1035\\] {
+      color: #F8FAFC !important;
+    }
+
+    /* Dashboard items entrance & exit animations */
+    @keyframes itemEntrance {
+      0% { opacity: 0; transform: translateX(-16px) scale(0.97); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    @keyframes itemExit {
+      0% { opacity: 1; transform: scale(1) translateY(0); max-height: 250px; margin-bottom: 0.75rem; }
+      100% { opacity: 0; transform: scale(0.93) translateY(-10px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-color: transparent; overflow: hidden; }
+    }
+
+    #dashboardList > div.bg-white {
+      animation: itemEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      background: rgba(255, 255, 255, 0.7) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.8) !important;
+      border-radius: 1.5rem !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+      padding: 1.25rem 1.5rem !important;
+      margin-bottom: 0.85rem !important;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dark #dashboardList > div.bg-white {
+      background: rgba(30, 41, 59, 0.75) !important;
+      border-color: rgba(71, 85, 105, 0.6) !important;
+      color: #F8FAFC !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    #dashboardList > div.bg-white:hover {
+      background: rgba(255, 255, 255, 0.88) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06) !important;
+      transform: translateY(-2px);
+    }
+
+    .dark #dashboardList > div.bg-white:hover {
+      background: rgba(30, 41, 59, 0.9) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    #dashboardList > div.card-exit {
+      animation: itemExit 0.32s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+      pointer-events: none !important;
+    }
+
+    /* Restyle buttons inside dashboardList items */
+    #dashboardList .view-plan-btn {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+      color: #ffffff !important;
+      border-radius: 9999px !important;
+      padding: 0.45rem 1.15rem !important;
+      font-family: 'Manrope', sans-serif !important;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.28) !important;
+      transition: all 0.2s ease !important;
+    }
+    #dashboardList .view-plan-btn:hover {
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.42) !important;
+      transform: translateY(-1px);
+    }
+    #dashboardList .delete-plan-btn {
+      background: rgba(255, 255, 255, 0.6) !important;
+      border: 1px solid rgba(203, 213, 225, 0.7) !important;
+      color: #64748B !important;
+      border-radius: 9999px !important;
+      padding: 0.45rem 1.15rem !important;
+      font-family: 'Manrope', sans-serif !important;
+      font-weight: 600 !important;
+      transition: all 0.2s ease !important;
+    }
+    .dark #dashboardList .delete-plan-btn {
+      background: rgba(51, 65, 85, 0.6) !important;
+      border-color: rgba(100, 116, 139, 0.6) !important;
+      color: #94A3B8 !important;
+    }
+    #dashboardList .delete-plan-btn:hover {
+      background: rgba(239, 68, 68, 0.08) !important;
+      color: #EF4444 !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
+    }
+    #dashboardList .view-plan-btn:active,
+    #dashboardList .delete-plan-btn:active {
+      transform: scale(0.95) !important;
+    }
+
+    /* ── Placeholder / Helper Text Muted Styles ── */
+    #ideaInput::placeholder,
+    #loadingState span,
+    #planOutput .min-h-\\[260px\\] span,
+    #dashboardList > p {
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-weight: 500 !important;
+    }
+
+    /* Transform plain italic "No saved plans yet" into a soft Apple empty card */
+    #dashboardList > p {
+      font-style: normal !important;
+      color: #64748B !important;
+      font-size: 0.95rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.85rem !important;
+      padding: 3.5rem 1.5rem !important;
+      margin: 0 !important;
+      background: rgba(255, 255, 255, 0.35) !important;
+      border: 1px dashed rgba(203, 213, 225, 0.7) !important;
+      border-radius: 1.5rem !important;
+      text-align: center !important;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01) !important;
+    }
+
+    .dark #dashboardList > p {
+      color: #94A3B8 !important;
+      background: rgba(30, 41, 59, 0.4) !important;
+      border-color: rgba(71, 85, 105, 0.6) !important;
+    }
+
+    #dashboardList > p::before {
+      content: "" !important;
+      display: inline-block !important;
+      width: 38px !important;
+      height: 38px !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%236366F1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.66-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z' /%3E%3C/svg%3E") !important;
+      background-size: 22px 22px !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      background-color: rgba(255, 255, 255, 0.85) !important;
+      border: 1px solid rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+      border-radius: 0.85rem !important;
+      flex-shrink: 0 !important;
+    }
+
+    .dark #dashboardList > p::before {
+      background-color: rgba(51, 65, 85, 0.8) !important;
+      border-color: rgba(71, 85, 105, 0.8) !important;
+    }
+
+    /* ── Print-Friendly Stylesheet ── */
+    @media print {
+      body { background: white !important; color: black !important; font-size: 11pt !important; }
+      header, footer, .orb-float-1, .orb-float-2, .orb-float-3, #planActionsBar, #toastContainer, section:first-child, section:last-child { display: none !important; }
+      main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .grid { display: block !important; }
+      section { box-shadow: none !important; border: none !important; background: transparent !important; padding: 0 !important; }
+      #planOutput div.bg-white, .dark #planOutput div.bg-white { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; color: black !important; margin-bottom: 15px !important; }
+      #planOutput h3, #planOutput .text-\\[\\#1B1035\\], #planOutput p, #planOutput li, #planOutput span { color: black !important; text-shadow: none !important; }
+      * { transition: none !important; animation: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-[#1D1D1F] selection:bg-[#6366F1]/20 selection:text-[#4F46E5] relative">
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+  <!-- Decorative Background Orbs -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-32 -left-32 w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-[#4F46E5]/20 via-[#7C3AED]/15 to-transparent blur-[110px] orb-float-1 dark:opacity-30"></div>
+    <div class="absolute top-1/3 -right-36 w-[620px] h-[620px] rounded-full bg-gradient-to-bl from-[#7C3AED]/20 via-[#06B6D4]/15 to-transparent blur-[130px] orb-float-2 dark:opacity-30"></div>
+    <div class="absolute -bottom-36 left-1/4 w-[520px] h-[520px] rounded-full bg-gradient-to-t from-[#06B6D4]/15 via-[#6366F1]/15 to-transparent blur-[120px] orb-float-3 dark:opacity-30"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/75 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/80 dark:border-slate-800 transition-all duration-300 px-6 py-5">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl md:text-3xl brand-wordmark">Synapse.ai</h1>
+        <p class="text-xs md:text-sm uppercase mt-1 brand-tagline">Search Less. Solve More.</p>
+      </div>
+      <!-- Theme Toggle -->
+      <div class="flex items-center self-end sm:self-auto">
+        <button id="themeToggleBtn" type="button" aria-label="Toggle light and dark theme" class="px-3.5 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700/80 transition-all shadow-sm text-xs font-semibold flex items-center gap-1.5">
+          <span class="dark:hidden">🌙 Dark Mode</span>
+          <span class="hidden dark:inline">☀️ Light Mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main two-column layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- LEFT: Idea Intake -->
+      <section class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.06),_0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] animate-card-1 flex flex-col justify-between">
+        <div>
+          <h2 class="text-xl tracking-tight mb-4">New Project Idea</h2>
+          <label for="ideaInput" class="sr-only">Project idea</label>
+          <textarea
+            id="ideaInput"
+            rows="5"
+            placeholder="e.g. Build an AI solution to reduce food waste"
+            class="w-full border border-slate-200/80 dark:border-slate-700/80 rounded-2xl bg-white/80 dark:bg-slate-800/80 px-4 py-3.5 text-sm md:text-base text-[#1D1D1F] dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 resize-none shadow-sm transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#6366F1]/25 focus:border-[#6366F1] focus:bg-white dark:focus:bg-slate-800"
+          ></textarea>
+          <!-- Idea input helpers: shortcut hint & live char counter -->
+          <div class="flex items-center justify-between mt-2.5 text-xs font-medium text-slate-400 dark:text-slate-400 px-1">
+            <span>💡 Tip: <kbd class="px-1.5 py-0.5 text-[10px] rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-sans">⌘/Ctrl + Enter</kbd> to generate</span>
+            <span id="charCounter" class="font-semibold text-slate-500 dark:text-slate-400">0 characters</span>
+          </div>
+          <!-- Clickable example-idea chips -->
+          <div id="ideaChips" class="mt-3.5 flex flex-wrap gap-1.5">
+            <button type="button" class="idea-chip text-xs font-medium px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 dark:bg-indigo-500/20 dark:hover:bg-indigo-500/30 border border-indigo-500/20 transition-all text-left truncate max-w-[230px]" data-idea="Build an AI solution to reduce food waste on campuses">🍏 Campus Food Waste AI</button>
+            <button type="button" class="idea-chip text-xs font-medium px-3 py-1 rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 dark:bg-teal-500/20 dark:hover:bg-teal-500/30 border border-teal-500/20 transition-all text-left truncate max-w-[230px]" data-idea="Develop an IoT solar energy monitoring app for community microgrids">☀️ Community Solar IoT</button>
+            <button type="button" class="idea-chip text-xs font-medium px-3 py-1 rounded-full bg-violet-500/10 hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 dark:bg-violet-500/20 dark:hover:bg-violet-500/30 border border-violet-500/20 transition-all text-left truncate max-w-[230px]" data-idea="An LLM research copilot that cross-verifies empirical scientific citations">🔬 Citation Verify AI</button>
+            <button type="button" class="idea-chip text-xs font-medium px-3 py-1 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 dark:bg-cyan-500/20 dark:hover:bg-cyan-500/30 border border-cyan-500/20 transition-all text-left truncate max-w-[230px]" data-idea="Decentralized peer-to-peer textbook and scientific lab gear exchange">📚 Lab Gear Exchange</button>
+          </div>
+          <!-- Duplicate idea banner -->
+          <div id="duplicateBanner" class="hidden mt-4 p-3.5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs md:text-sm font-medium flex items-center justify-between gap-2 shadow-sm animate-pulse">
+            <span id="duplicateText" class="flex items-center gap-1.5"><span class="text-base">⚠️</span><span>This looks similar to a saved plan — check your dashboard first?</span></span>
+            <button id="closeDuplicateBtn" type="button" class="font-bold text-amber-700 dark:text-amber-300 hover:opacity-75 p-1">✕</button>
+          </div>
+          <p id="ideaError" class="hidden mt-3 text-xs md:text-sm font-medium text-rose-500 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/20 px-3.5 py-2.5 rounded-2xl"></p>
+        </div>
+        <div>
+          <button
+            id="generateBtn"
+            type="button"
+            class="mt-6 w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#4F46E5] via-[#7C3AED] to-[#06B6D4] text-white font-semibold text-sm md:text-base shadow-[0_10px_25px_rgba(99,102,241,0.32)] hover:shadow-[0_14px_35px_rgba(124,58,237,0.45)] hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0 transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_10px_25px_rgba(99,102,241,0.32)] disabled:hover:translate-y-0"
+          >
+            Generate Plan
+          </button>
+          <div id="loadingState" class="hidden mt-6 p-5 rounded-2xl bg-gradient-to-br from-[#4F46E5]/5 via-[#7C3AED]/5 to-slate-500/5 dark:from-[#4F46E5]/10 dark:via-[#7C3AED]/10 dark:to-slate-800/20 border border-[#6366F1]/15 dark:border-slate-700 backdrop-blur-md transition-all duration-300">
+            <!-- Top progress-bar-style loading indicator -->
+            <div class="fixed top-0 left-0 right-0 h-[3px] z-50 overflow-hidden bg-slate-200/50 dark:bg-slate-800 shadow-sm">
+              <div class="h-full bg-gradient-to-r from-[#4F46E5] via-[#7C3AED] via-[#06B6D4] to-[#4F46E5] w-[200%] top-progress-bar"></div>
+            </div>
+            <!-- Apple-style pulsing dots and loading text -->
+            <div class="flex items-center gap-3.5 text-xs md:text-sm font-medium text-[#1D1D1F]/85 dark:text-slate-200">
+              <div class="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#4F46E5] dark:bg-indigo-400 pulse-dot" style="animation-delay: 0s;"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#7C3AED] dark:bg-purple-400 pulse-dot" style="animation-delay: 0.2s;"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#06B6D4] dark:bg-teal-400 pulse-dot" style="animation-delay: 0.4s;"></span>
+              </div>
+              <span class="leading-relaxed">Synthesizing your plan across problem framing, tech stack, and prior work...</span>
+            </div>
+            <!-- Shimmer skeleton preview bars -->
+            <div class="mt-4 space-y-2.5 pt-3 border-t border-slate-200/40 dark:border-slate-700/60" aria-hidden="true">
+              <div class="h-2 bg-gradient-to-r from-slate-200/50 via-[#6366F1]/25 to-slate-200/50 dark:from-slate-700/50 dark:via-indigo-500/25 dark:to-slate-700/50 rounded-full w-3/4 shimmer-bg"></div>
+              <div class="h-2 bg-gradient-to-r from-slate-200/50 via-[#7C3AED]/20 to-slate-200/50 dark:from-slate-700/50 dark:via-purple-500/25 dark:to-slate-700/50 rounded-full w-1/2 shimmer-bg" style="animation-delay: 0.3s;"></div>
+              <div class="h-2 bg-gradient-to-r from-slate-200/50 via-[#06B6D4]/20 to-slate-200/50 dark:from-slate-700/50 dark:via-teal-500/25 dark:to-slate-700/50 rounded-full w-5/6 shimmer-bg" style="animation-delay: 0.6s;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Project HUB -->
+      <section class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.06),_0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] animate-card-2 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+            <h2 class="text-xl tracking-tight">Project HUB</h2>
+            <!-- Export options on Project HUB -->
+            <div id="planActionsBar" class="hidden flex flex-wrap items-center gap-1.5">
+              <button id="copyMdBtn" type="button" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1">📋 Markdown</button>
+              <button id="copyJsonBtn" type="button" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1">{ } JSON</button>
+              <button id="printPdfBtn" type="button" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1">🖨️ PDF</button>
+            </div>
+          </div>
+          <div id="planOutput">
+            <div class="min-h-[300px] flex items-center justify-center">
+              <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 text-sm font-medium text-slate-500 dark:text-slate-400 py-12 px-6 bg-white/35 dark:bg-slate-800/35 border border-slate-200/70 dark:border-slate-700/70 border-dashed rounded-2xl w-full text-center shadow-inner-sm">
+                <div class="p-2.5 rounded-xl bg-white/85 dark:bg-slate-800 border border-white/95 dark:border-slate-700 shadow-[0_4px_12px_rgba(0,0,0,0.04)] text-[#6366F1] dark:text-indigo-400 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+                  </svg>
+                </div>
+                <span>Your structured plan will appear here</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Personalized Dashboard -->
+    <section class="mt-8 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.06),_0_1px_3px_rgba(0,0,0,0.02)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] animate-card-3">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <h2 class="text-xl tracking-tight">Personalized Dashboard</h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Compare plans button -->
+          <button
+            id="comparePlansBtn"
+            type="button"
+            disabled
+            class="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold py-2 px-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md transition-all duration-200 ease-out hover:opacity-95 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+          >
+            <span>⚖️ Compare (<span id="compareCount">0</span>/2)</span>
+          </button>
+          <button
+            id="clearDashboardBtn"
+            type="button"
+            class="text-xs md:text-sm font-medium py-2 px-5 rounded-full bg-slate-100/70 hover:bg-slate-200/80 text-slate-600 hover:text-[#4F46E5] dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 backdrop-blur-md shadow-sm hover:shadow transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95 active:translate-y-0 shrink-0"
+          >
+            Clear Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- Search / Filter & Sort Controls -->
+      <div id="dashboardControls" class="mb-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 backdrop-blur-md shadow-inner-sm">
+        <div class="relative flex-1">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-xs">🔍</span>
+          <input id="dashboardSearch" type="text" placeholder="Search saved ideas by keyword..." class="w-full pl-8 pr-4 py-1.5 text-xs md:text-sm bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <label for="dashboardSort" class="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Sort by:</label>
+          <select id="dashboardSort" class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="az">A–Z by Idea</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="dashboardList" class="text-sm text-black/50 dark:text-slate-400 italic">
+        No saved plans yet
+      </div>
+    </section>
+  </main>
+
+  <!-- Compare Modal -->
+  <div id="compareModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="p-5 md:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-800/60">
+        <h3 class="text-lg md:text-xl font-bold text-[#1E1B4B] dark:text-indigo-200 flex items-center gap-2 font-sans">
+          <span>⚖️ Side-by-Side Plan Comparison</span>
+        </h3>
+        <button id="closeCompareBtn" type="button" aria-label="Close comparison modal" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors font-bold text-base">✖</button>
+      </div>
+      <div id="compareModalContent" class="p-5 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </div>
+  </div>
+
+  <footer class="text-center text-xs font-medium text-slate-500 dark:text-slate-500 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg py-8 px-4 border-t border-white/80 dark:border-slate-800 mt-16 relative z-10">
+    Synapse.ai — Team Catalyst · an iNSIGHTS Layer 2 Copilot
+  </footer>
+
+  <script src="app.js"></script>
+  <!-- Visual UI transitions & theme helper -->
+  <script>
+    (function() {
+      const header = document.querySelector('header');
+      if (header) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 12) {
+            header.classList.add('shadow-[0_8px_30px_rgba(0,0,0,0.06)]', 'dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]');
+            header.classList.remove('bg-white/75', 'dark:bg-slate-900/80');
+            header.classList.add('bg-white/90', 'dark:bg-slate-900/95');
+          } else {
+            header.classList.remove('shadow-[0_8px_30px_rgba(0,0,0,0.06)]', 'dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]', 'bg-white/90', 'dark:bg-slate-900/95');
+            header.classList.add('bg-white/75', 'dark:bg-slate-900/80');
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
