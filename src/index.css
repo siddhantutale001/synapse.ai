@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* VisionOS Glass Panel Styles with Edge Light Refraction */
+  .ios-glass {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ios-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .dark .ios-glass {
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 35px -10px rgba(0, 0, 0, 0.6), 0 0 20px -5px rgba(99, 102, 241, 0.05);
+  }
+
+  .dark .ios-glass::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  }
+
+  /* Glass Shimmer Reflection Effect */
+  .glass-shimmer::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 45%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.05) 55%,
+      transparent 100%
+    );
+    transform: rotate(30deg) translateY(-100%);
+    transition: transform 0.6s ease-out;
+    pointer-events: none;
+  }
+
+  .glass-shimmer:hover::after {
+    transform: rotate(30deg) translateY(100%);
+  }
+
+  /* Micro-interactions & VisionOS Hover Physics */
+  .btn-interactive {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-interactive:active {
+    transform: scale(0.95);
+  }
+
+  .card-hover {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-3px) scale(1.008);
+    box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.12), 0 0 15px 0 rgba(99, 102, 241, 0.08);
+  }
+
+  .dark .card-hover:hover {
+    box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.8), 0 0 20px 0 rgba(6, 182, 212, 0.12);
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Staggered Delay Utilities */
+.delay-75 { animation-delay: 75ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* iOS Light & Dark Mode Base Settings */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark body {
+  background-color: #080c14;
+  color: #f8fafc;
+}
+
+/* iOS Custom Scrollbars for Light and Dark Modes */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.6);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* Print Stylesheet for Pitch Deck & Full PDF Export */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide interactive web UI */
+  .no-print,
+  .print-hidden,
+  header,
+  nav,
+  button {
+    display: none !important;
+  }
+
+  /* Printable Report Container */
+  .printable-report-wrapper,
+  .printable-report {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Override dark mode white text inside printable report so text is crisp black/slate */
+  .printable-report,
+  .printable-report * {
+    color: #0f172a !important;
+    background-color: transparent !important;
+    border-color: #cbd5e1 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Card backgrounds for printed sections */
+  .printable-report .bg-white\/50,
+  .printable-report .bg-slate-100,
+  .printable-report .bg-slate-50,
+  .printable-report .dark\:bg-slate-900,
+  .printable-report .dark\:bg-slate-900\/60,
+  .printable-report .dark\:bg-slate-950,
+  .printable-report .dark\:bg-slate-800,
+  .printable-report .dark\:bg-slate-800\/90,
+  .printable-report .ios-glass {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+  }
+
+  /* Headings & Brand accents in print */
+  .printable-report h1,
+  .printable-report h2,
+  .printable-report h3,
+  .printable-report h4,
+  .printable-report h5,
+  .printable-report h6,
+  .printable-report strong {
+    color: #0f172a !important;
+  }
+
+  .printable-report .text-indigo-600,
+  .printable-report .dark\:text-indigo-400,
+  .printable-report .dark\:text-cyan-400,
+  .printable-report .text-brand-600 {
+    color: #4f46e5 !important;
+  }
+
+  .printable-report .text-emerald-600,
+  .printable-report .dark\:text-emerald-400 {
+    color: #059669 !important;
+  }
+
+  .printable-report .text-rose-600,
+  .printable-report .dark\:text-rose-400 {
+    color: #e11d48 !important;
+  }
+
+  .printable-report .text-amber-600,
+  .printable-report .dark\:text-amber-400 {
+    color: #d97706 !important;
+  }
+
+  .printable-report .text-slate-500,
+  .printable-report .text-slate-400,
+  .printable-report .dark\:text-slate-400,
+  .printable-report .dark\:text-slate-500 {
+    color: #475569 !important;
+  }
+
+  .print-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem;
+  }
+
+  .print-page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+}
