@@ -17,8 +17,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Parsers form-encoded bodies from Twilio Webhook
 
-// Health Check Endpoint
-app.get('/health', (req, res) => {
+// Health Check & Root Endpoints (Supports GET & HEAD for UptimeRobot Free Tier)
+app.all('/', (req, res) => {
+  res.status(200).json({ status: 'online', service: 'Synapse.AI Node Backend API', version: '2.0.0' });
+});
+
+app.all('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 

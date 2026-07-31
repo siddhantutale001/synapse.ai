@@ -9,6 +9,13 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+# Load .env file if present
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, rely on system env vars
+
 app = FastAPI(
     title="Synapse.AI - iNSIGHTS Layer 2 Microservice",
     description="Python FastAPI service handling DeepSearch, Knowledge Clustering, and Project HUB roadmap generation",
@@ -1001,7 +1008,7 @@ def generate_dynamic_project_hub(raw_idea: str, prefs: Optional[UserPreferences]
 
 # --- Endpoints ---
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def health_check():
     return {
         "status": "online",
