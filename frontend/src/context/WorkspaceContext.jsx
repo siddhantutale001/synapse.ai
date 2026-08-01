@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import api, { setupApiAuth } from '../services/api.js';
 import { defaultProfile, defaultWorkspace } from '../services/mockData.js';
@@ -14,8 +15,8 @@ function extractKeywords(text) {
 }
 
 export const WorkspaceProvider = ({ children }) => {
-  const [currentScreen, setCurrentScreen] = useState('idea'); // idea | deepsearch | clustering | projecthub | dashboard | agent
-  const [profile, setProfile] = useState(defaultProfile);
+  const [currentScreen, setCurrentScreen] = useState('idea');
+  const [profile, setProfile] = useState(null); // null = not yet loaded
   const [workspaces, setWorkspaces] = useState([]);
   const [activeWorkspace, setActiveWorkspace] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ export const WorkspaceProvider = ({ children }) => {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
   const [language, setLanguage] = useState('EN');
+  const hasFetchedRef = useRef(false); // prevent double-fetch
 
   let getToken = null;
   let clerkSignOut = null;
@@ -42,7 +44,9 @@ export const WorkspaceProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!getToken) return; // Wait until Clerk auth token is ready
+    if (!getToken) return;
+    if (hasFetchedRef.current) return; // only run once after auth is ready
+    hasFetchedRef.current = true;
     setupApiAuth(getToken);
     fetchProfile();
     fetchWorkspaces();
@@ -52,12 +56,18 @@ export const WorkspaceProvider = ({ children }) => {
     try {
       const res = await api.get('/user/profile');
       if (res.data?.success) {
-        setProfile(res.data.data);
-        if (res.data.data.isProfileComplete === false) {
+        const profileData = res.data.data;
+        setProfile(profileData);
+        // Show onboarding if profile is explicitly incomplete
+        if (profileData.isProfileComplete === false) {
           setOnboardingModalOpen(true);
         }
       }
     } catch (err) {
+      // 404 means brand new user — show onboarding
+      if (err?.response?.status === 404) {
+        setOnboardingModalOpen(true);
+      }
       console.warn('API fetch profile notice:', err.message);
     }
   };

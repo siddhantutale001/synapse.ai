@@ -151,7 +151,7 @@ export default function ProfileModal() {
         <div className="flex space-x-2 border-b border-[#E6E8F5] pb-2">
           {[
             { id: 'academic', label: '👤 Academic Profile', icon: User },
-            { id: 'gemini', label: '🧠 Gemini Persona', icon: Sparkles },
+            { id: 'gemini', label: '🧠 Custom Persona', icon: Sparkles },
             { id: 'research', label: '🔬 Research Sources', icon: BookOpen },
             { id: 'companion', label: '🔔 Companions', icon: Bell },
           ].map(tab => {

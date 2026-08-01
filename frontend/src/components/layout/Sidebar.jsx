@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import {
   Lightbulb,
   Search,
@@ -19,6 +20,7 @@ import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@cl
 import { useWorkspace } from '../../context/WorkspaceContext.jsx';
 
 export default function Sidebar() {
+  const { user } = useUser();
   const {
     currentScreen,
     setCurrentScreen,
@@ -194,7 +196,9 @@ export default function Sidebar() {
             <div className="flex items-center space-x-2.5 min-w-0">
               <UserButton userProfileMode="navigation" />
               <div className="min-w-0">
-                <h5 className="text-xs font-semibold text-white truncate">{profile?.displayName || 'User Profile'}</h5>
+                <h5 className="text-xs font-semibold text-white truncate">
+                  {profile?.displayName || user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || 'User'}
+                </h5>
                 <p className="text-[10px] text-teal font-mono truncate">{profile?.geminiAiPreferences?.personaMode || 'HACKATHON_SPRINT'}</p>
               </div>
             </div>
