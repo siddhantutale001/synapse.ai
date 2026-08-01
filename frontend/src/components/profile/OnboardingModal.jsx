@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { Sparkles, CheckCircle2, AlertCircle, RefreshCw, Github, Mail, User, GraduationCap, Code } from 'lucide-react';
 import api from '../../services/api.js';
 import { useWorkspace } from '../../context/WorkspaceContext.jsx';
 import { verifyGithubProfile, validateEmail } from '../../utils/validation.js';
 
 export default function OnboardingModal() {
+  const { user } = useUser();
   const { onboardingModalOpen, setOnboardingModalOpen, profile, setProfile } = useWorkspace();
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || '';
 
   const [formData, setFormData] = useState({
     displayName: '',
-    email: '',
+    email: userEmail,
     college: '',
     major: '',
     yearOfStudy: '1st Year',
@@ -21,6 +25,12 @@ export default function OnboardingModal() {
   const [githubStatus, setGithubStatus] = useState({ checking: false, valid: false, message: '', avatar: null });
   const [emailStatus, setEmailStatus] = useState({ valid: false, message: '' });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (userEmail && !formData.email) {
+      setFormData(prev => ({ ...prev, email: userEmail }));
+    }
+  }, [userEmail]);
 
   // Live GitHub verification with debounce
   useEffect(() => {
@@ -56,11 +66,10 @@ export default function OnboardingModal() {
     e.preventDefault();
     setLoading(true);
 
-    // Build updated profile locally first — modal will always close
     const updatedProfile = {
       ...profile,
       displayName: formData.displayName,
-      email: formData.email,
+      email: formData.email || userEmail,
       academic: {
         college: formData.college,
         major: formData.major,
@@ -70,8 +79,7 @@ export default function OnboardingModal() {
       },
       geminiAiPreferences: {
         ...(profile?.geminiAiPreferences || {}),
-        personaMode: formData.personaMode,
-        aboutUser: `${formData.yearOfStudy} ${formData.major} student at ${formData.college}. Role: ${formData.developerRole}.`
+        personaMode: formData.personaMode
       },
       isProfileComplete: true
     };
@@ -79,27 +87,27 @@ export default function OnboardingModal() {
     try {
       await api.put('/user/profile/academic', {
         displayName: formData.displayName,
-        email: formData.email,
+        email: formData.email || userEmail,
         college: formData.college,
         major: formData.major,
         yearOfStudy: formData.yearOfStudy,
         developerRole: formData.developerRole,
         githubUrl: formData.githubUrl
-      });
+      }).catch(err => console.warn('Academic profile save notice:', err));
 
       await api.put('/user/profile/ai-preferences', {
         personaMode: formData.personaMode,
         aboutUser: `${formData.yearOfStudy} ${formData.major} student at ${formData.college}. Role: ${formData.developerRole}.`
-      });
+      }).catch(err => console.warn('AI preferences save notice:', err));
     } catch (err) {
-      console.warn('Profile save API notice (local state still updated):', err.message);
+      console.error('Error completing onboarding profile:', err);
     } finally {
-      // Always close modal and update local state regardless of API success
       setProfile(updatedProfile);
-      setOnboardingModalOpen(false);
       setLoading(false);
+      setOnboardingModalOpen(false);
     }
   };
+
 
   if (!onboardingModalOpen) return null;
 
