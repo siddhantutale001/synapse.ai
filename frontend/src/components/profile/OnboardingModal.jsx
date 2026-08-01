@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { Sparkles, CheckCircle2, AlertCircle, RefreshCw, Github, Mail, User, GraduationCap, Code } from 'lucide-react';
 import api from '../../services/api.js';
 import { useWorkspace } from '../../context/WorkspaceContext.jsx';
@@ -7,6 +7,7 @@ import { verifyGithubProfile, validateEmail } from '../../utils/validation.js';
 
 export default function OnboardingModal() {
   const { user } = useUser();
+  const { isSignedIn } = useAuth();
   const { onboardingModalOpen, setOnboardingModalOpen, profile, setProfile } = useWorkspace();
 
   const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || '';
@@ -121,7 +122,7 @@ export default function OnboardingModal() {
   };
 
 
-  if (!onboardingModalOpen) return null;
+  if (!onboardingModalOpen || !isSignedIn) return null;
 
   return (
     <div className="fixed inset-0 bg-[#0D0F2B]/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">

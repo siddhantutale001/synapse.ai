@@ -28,10 +28,12 @@ export const WorkspaceProvider = ({ children }) => {
 
   let getToken = null;
   let clerkSignOut = null;
+  let isSignedIn = false;
 
   try {
     const auth = useAuth();
     getToken = auth?.getToken;
+    isSignedIn = auth?.isSignedIn;
   } catch (e) {
     console.warn('Clerk auth hook notice:', e.message);
   }
@@ -44,11 +46,14 @@ export const WorkspaceProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!getToken) return;
+    if (!getToken || !isSignedIn) {
+      setOnboardingModalOpen(false);
+      return;
+    }
     setupApiAuth(getToken);
     fetchProfile();
     fetchWorkspaces();
-  }, [getToken]);
+  }, [getToken, isSignedIn]);
 
   const updateProfileState = (newProfile) => {
     setProfile(newProfile);
