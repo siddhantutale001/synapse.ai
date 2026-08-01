@@ -36,12 +36,14 @@ export const getProfile = async (req, res, next) => {
       });
     }
 
+    const isComplete = userDoc.isProfileComplete === true || Boolean(userDoc.displayName || userDoc.academic?.college || userDoc.academic?.major);
+
     res.status(200).json({
       success: true,
       data: {
         ...userDoc,
         uid: userDoc.uid || userId,
-        isProfileComplete: userDoc.isProfileComplete !== false && Boolean(userDoc.displayName || userDoc.academic?.college)
+        isProfileComplete: isComplete
       }
     });
   } catch (err) {
@@ -78,6 +80,7 @@ export const updateAiPreferences = async (req, res, next) => {
 
     await firestoreService.saveUserProfile(userId, { 
       geminiAiPreferences: updatedPreferences,
+      isProfileComplete: true,
       updatedAt: new Date().toISOString()
     });
 
@@ -107,16 +110,20 @@ export const updateAcademicProfile = async (req, res, next) => {
       linkedinUrl: linkedinUrl || ''
     };
 
-    await firestoreService.saveUserProfile(userId, { 
+    const profileData = {
+      uid: userId,
       displayName: displayName || req.body.displayName || '',
       email: email || '',
       academic: updatedAcademic,
       isProfileComplete: true,
       updatedAt: new Date().toISOString()
-    });
+    };
+
+    await firestoreService.saveUserProfile(userId, profileData);
 
     res.status(200).json({
       success: true,
+      data: profileData,
       message: 'Academic profile saved successfully'
     });
   } catch (err) {

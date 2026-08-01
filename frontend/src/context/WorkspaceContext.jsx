@@ -52,21 +52,59 @@ export const WorkspaceProvider = ({ children }) => {
     fetchWorkspaces();
   }, [getToken]);
 
+  const updateProfileState = (newProfile) => {
+    setProfile(newProfile);
+    if (newProfile) {
+      try {
+        localStorage.setItem('synapse_user_profile', JSON.stringify(newProfile));
+      } catch (e) {
+        console.warn('LocalStorage save error:', e);
+      }
+    }
+  };
+
   const fetchProfile = async () => {
+    let cachedProfile = null;
+    try {
+      const stored = localStorage.getItem('synapse_user_profile');
+      if (stored) {
+        cachedProfile = JSON.parse(stored);
+        if (cachedProfile && (cachedProfile.isProfileComplete || cachedProfile.displayName)) {
+          setProfile(cachedProfile);
+        }
+      }
+    } catch (e) {
+      console.warn('LocalStorage read error:', e);
+    }
+
     try {
       const res = await api.get('/user/profile');
       if (res.data?.success) {
         const profileData = res.data.data;
-        setProfile(profileData);
-        // Show onboarding if profile is explicitly incomplete
-        if (profileData.isProfileComplete === false) {
-          setOnboardingModalOpen(true);
+        const isComplete = profileData.isProfileComplete || Boolean(profileData.displayName || profileData.academic?.college);
+        
+        if (isComplete) {
+          const finalProfile = { ...profileData, isProfileComplete: true };
+          updateProfileState(finalProfile);
+          setOnboardingModalOpen(false);
+        } else if (cachedProfile && (cachedProfile.isProfileComplete || cachedProfile.displayName)) {
+          setProfile(cachedProfile);
+          setOnboardingModalOpen(false);
+        } else {
+          setProfile(profileData);
+          if (profileData.isProfileComplete === false) {
+            setOnboardingModalOpen(true);
+          }
         }
       }
     } catch (err) {
-      // 404 means brand new user — show onboarding
-      if (err?.response?.status === 404) {
-        setOnboardingModalOpen(true);
+      if (cachedProfile && (cachedProfile.isProfileComplete || cachedProfile.displayName)) {
+        setProfile(cachedProfile);
+        setOnboardingModalOpen(false);
+      } else {
+        if (err?.response?.status === 404) {
+          setOnboardingModalOpen(true);
+        }
       }
       console.warn('API fetch profile notice:', err.message);
     }
@@ -289,6 +327,7 @@ export const WorkspaceProvider = ({ children }) => {
    */
   const logout = async () => {
     try {
+      localStorage.removeItem('synapse_user_profile');
       setWorkspaces([]);
       setActiveWorkspace(null);
       setProfile(null);
@@ -306,6 +345,7 @@ export const WorkspaceProvider = ({ children }) => {
    */
   const deleteProfile = async () => {
     try {
+      localStorage.removeItem('synapse_user_profile');
       await api.delete('/user/profile');
     } catch (err) {
       console.warn('API error deleting profile, executing local state cleanup:', err.message);
@@ -318,7 +358,7 @@ export const WorkspaceProvider = ({ children }) => {
       currentScreen,
       setCurrentScreen,
       profile,
-      setProfile,
+      setProfile: updateProfileState,
       workspaces,
       activeWorkspace,
       setActiveWorkspace,
