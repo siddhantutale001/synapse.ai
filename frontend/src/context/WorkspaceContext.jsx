@@ -42,9 +42,8 @@ export const WorkspaceProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (getToken) {
-      setupApiAuth(getToken);
-    }
+    if (!getToken) return; // Wait until Clerk auth token is ready
+    setupApiAuth(getToken);
     fetchProfile();
     fetchWorkspaces();
   }, [getToken]);
@@ -133,56 +132,9 @@ export const WorkspaceProvider = ({ children }) => {
         throw new Error('API returned success=false');
       }
     } catch (err) {
-      console.warn('API notice creating workspace, performing synchronous research execution:', err.message);
-      const newWsId = `ws_${Math.random().toString(36).substring(2, 10)}`;
-      const kw = extractKeywords(rawIdea);
-      const mainKw = kw[0] || 'System';
-      const fallbackWs = {
-        ...defaultWorkspace,
-        workspaceId: newWsId,
-        title,
-        rawIdea,
-        status: 'COMPLETED',
-        createdAt: new Date().toISOString(),
-        deepsearch: {
-          problemValidation: {
-            summary: `Technical domain research for "${rawIdea}": Significant potential in ${mainKw} technology. Evaluated under ${profile?.geminiAiPreferences?.personaMode || 'HACKATHON_SPRINT'} mode.`,
-            severityScore: 8.8
-          },
-          citations: [
-            {
-              id: 'cit_01',
-              title: `Smart SOTA Architecture for ${mainKw} Systems`,
-              authors: ['R. Sharma', 'A. Verma'],
-              source: 'arXiv Paper',
-              type: 'PAPER',
-              url: 'https://arxiv.org/abs/2305.12345',
-              snippet: `Experimental methodology for ${mainKw} achieving high accuracy and optimization benchmarks in real-world testing.`,
-              relevanceScore: 0.95
-            },
-            {
-              id: 'cit_02',
-              title: `Open-Source Framework for ${mainKw} Engine`,
-              authors: ['OpenDev Research'],
-              source: 'GitHub',
-              type: 'GITHUB',
-              url: `https://github.com/topics/${mainKw.toLowerCase()}`,
-              snippet: `Modular reference implementation containing tools, API hooks, and models for ${mainKw}.`,
-              relevanceScore: 0.89
-            }
-          ]
-        }
-      };
-
-      setTimeout(() => {
-        setActiveWorkspace(fallbackWs);
-        setWorkspaces(prev => [fallbackWs, ...prev]);
-        setResearchProgress({ stage: 4, message: 'Research complete! Opening DeepSearch...', percent: 100 });
-        setTimeout(() => {
-          setLoading(false);
-          setCurrentScreen('deepsearch');
-        }, 400);
-      }, 3000);
+      console.error('API error creating workspace:', err.message);
+      setLoading(false);
+      setResearchProgress({ stage: 1, message: 'Connection error — please retry.', percent: 0 });
     }
   };
 
