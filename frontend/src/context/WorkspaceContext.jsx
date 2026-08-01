@@ -45,8 +45,6 @@ export const WorkspaceProvider = ({ children }) => {
 
   useEffect(() => {
     if (!getToken) return;
-    if (hasFetchedRef.current) return; // only run once after auth is ready
-    hasFetchedRef.current = true;
     setupApiAuth(getToken);
     fetchProfile();
     fetchWorkspaces();

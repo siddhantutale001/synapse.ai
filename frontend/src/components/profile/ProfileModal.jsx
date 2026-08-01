@@ -45,15 +45,18 @@ export default function ProfileModal() {
 
   useEffect(() => {
     if (profileModalOpen) {
+      if (profile && (profile.displayName || profile.academic?.college || profile.email)) {
+        setLocalProfile(prev => ({ ...prev, ...profile }));
+      }
       api.get('/user/profile')
         .then(res => {
-          if (res.data?.data) {
+          if (res.data?.data && (res.data.data.displayName || res.data.data.academic?.college)) {
             setLocalProfile(prev => ({ ...prev, ...res.data.data }));
           }
         })
         .catch(err => console.warn('Fetch profile notice:', err.message));
     }
-  }, [profileModalOpen]);
+  }, [profileModalOpen, profile]);
 
   // Live GitHub verification
   useEffect(() => {

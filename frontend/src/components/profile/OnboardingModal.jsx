@@ -27,10 +27,22 @@ export default function OnboardingModal() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (userEmail && !formData.email) {
+    if (profile && (profile.displayName || profile.academic?.college || profile.email)) {
+      setFormData(prev => ({
+        ...prev,
+        displayName: profile.displayName || prev.displayName,
+        email: profile.email || userEmail || prev.email,
+        college: profile.academic?.college || prev.college,
+        major: profile.academic?.major || prev.major,
+        yearOfStudy: profile.academic?.yearOfStudy || prev.yearOfStudy,
+        developerRole: profile.academic?.developerRole || prev.developerRole,
+        githubUrl: profile.academic?.githubUrl || prev.githubUrl,
+        personaMode: profile.geminiAiPreferences?.personaMode || prev.personaMode
+      }));
+    } else if (userEmail && !formData.email) {
       setFormData(prev => ({ ...prev, email: userEmail }));
     }
-  }, [userEmail]);
+  }, [profile, userEmail]);
 
   // Live GitHub verification with debounce
   useEffect(() => {
