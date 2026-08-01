@@ -120,27 +120,27 @@ function buildDynamicFallback(rawIdea, userPreferences = {}) {
       citations: [
         {
           id: "cit_01",
-          title: `Scalable Microservice Architecture for Event-Driven ${domain}`,
+          title: "Scalable Microservice Architecture for Event-Driven Distributed Systems",
           authors: ["R. Sharma", "A. Verma"],
           source: "IEEE Xplore",
           type: "PAPER",
           url: "https://arxiv.org/abs/2308.09101",
-          snippet: "Comprehensive benchmark evaluation of reactive event-driven streaming frameworks.",
+          snippet: "Comprehensive benchmark evaluation of reactive event-driven streaming frameworks across cloud-native deployments.",
           relevanceScore: 0.95
         },
         {
           id: "cit_02",
-          title: `Predictive Optimization and Analytics in Distributed Systems`,
+          title: "Predictive Optimization and Analytics in Distributed Software Pipelines",
           authors: ["K. Patel", "J. Lee"],
           source: "ACM SIGKDD",
           type: "PAPER",
           url: "https://arxiv.org/abs/2309.11121",
-          snippet: "Algorithmic resource allocation reducing computational latency across cloud workloads.",
+          snippet: "Algorithmic resource allocation reducing computational latency across heterogeneous cloud workloads.",
           relevanceScore: 0.92
         },
         {
           id: "cit_03",
-          title: "Open-Source Implementation Engine",
+          title: "Open-Source Modular System Architecture Framework",
           authors: ["OpenDev Community"],
           source: "GitHub",
           type: "GITHUB",
@@ -150,12 +150,12 @@ function buildDynamicFallback(rawIdea, userPreferences = {}) {
         },
         {
           id: "cit_04",
-          title: "Global Benchmark Dataset",
+          title: "Curated Benchmark Dataset for Algorithm Evaluation",
           authors: ["Kaggle Research"],
           source: "Kaggle",
           type: "DATASET",
           url: "https://kaggle.com/datasets",
-          snippet: "Curated dataset for training and testing algorithmic optimization models.",
+          snippet: "Curated dataset for training and testing algorithmic optimization models across real-world workloads.",
           relevanceScore: 0.85
         }
       ]
@@ -216,7 +216,7 @@ export const executeAiPipeline = async (workspaceId, rawIdea, userPreferences = 
         workspaceId,
         rawIdea,
         personaMode: userPreferences.personaMode || 'HACKATHON_SPRINT'
-      }, { timeout: 4000 });
+      }, { timeout: 30000 });
       deepsearchData = dsRes.data.deepsearch || dsRes.data;
     } catch (dsErr) {
       console.warn(`[Pipeline] DeepSearch microservice fallback triggered for '${rawIdea}'`);
@@ -233,7 +233,7 @@ export const executeAiPipeline = async (workspaceId, rawIdea, userPreferences = 
         workspaceId,
         rawIdea,
         deepsearch: deepsearchData
-      }, { timeout: 4000 });
+      }, { timeout: 30000 });
       clusteringData = clusterRes.data.clustering || clusterRes.data;
     } catch (cErr) {
       console.warn(`[Pipeline] Clustering microservice fallback triggered`);
@@ -250,7 +250,7 @@ export const executeAiPipeline = async (workspaceId, rawIdea, userPreferences = 
         workspaceId,
         rawIdea,
         userPreferences
-      }, { timeout: 4000 });
+      }, { timeout: 30000 });
       projectHubData = hubRes.data.projectHub || hubRes.data;
     } catch (hErr) {
       console.warn(`[Pipeline] Project Hub microservice fallback triggered`);
