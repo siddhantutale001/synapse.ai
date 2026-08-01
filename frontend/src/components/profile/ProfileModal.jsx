@@ -261,8 +261,8 @@ export default function ProfileModal() {
                   />
                 </div>
 
-                {/* GitHub input with Live API verification */}
-                <div>
+                {/* GitHub input with Live API verification + Avatar display */}
+                <div className={githubStatus.valid && githubStatus.avatar ? 'md:col-span-2' : ''}>
                   <label className="block text-xs font-mono font-bold text-[#FF5A3C] uppercase mb-1 flex items-center justify-between">
                     <span className="flex items-center space-x-1">
                       <Github className="w-3.5 h-3.5" />
@@ -287,26 +287,35 @@ export default function ProfileModal() {
                       )
                     ) : null}
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="https://github.com/username"
-                      value={localProfile.academic?.githubUrl || ''}
-                      onChange={e => setLocalProfile({ ...localProfile, academic: { ...localProfile.academic, githubUrl: e.target.value } })}
-                      className={`w-full bg-[#F5F6FD] border rounded-xl px-3.5 py-2.5 text-xs text-[#12162A] focus:outline-none transition ${
-                        githubStatus.valid 
-                          ? 'border-[#00D3A0] bg-white' 
-                          : githubStatus.message && !githubStatus.valid 
-                          ? 'border-[#FF5A3C] bg-white' 
-                          : 'border-[#E6E8F5] focus:border-[#8C5CFF]'
-                      }`}
-                    />
-                    {githubStatus.avatar && (
-                      <img 
-                        src={githubStatus.avatar} 
-                        alt="Avatar" 
-                        className="w-5 h-5 rounded-full absolute right-3 top-2.5 border border-[#E6E8F5]"
+                  <div className={`flex items-start gap-3 ${githubStatus.valid && githubStatus.avatar ? 'flex-row' : ''}`}>
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        placeholder="https://github.com/username"
+                        value={localProfile.academic?.githubUrl || ''}
+                        onChange={e => setLocalProfile({ ...localProfile, academic: { ...localProfile.academic, githubUrl: e.target.value } })}
+                        className={`w-full bg-[#F5F6FD] border rounded-xl px-3.5 py-2.5 text-xs text-[#12162A] focus:outline-none transition ${
+                          githubStatus.valid 
+                            ? 'border-[#00D3A0] bg-white' 
+                            : githubStatus.message && !githubStatus.valid 
+                            ? 'border-[#FF5A3C] bg-white' 
+                            : 'border-[#E6E8F5] focus:border-[#8C5CFF]'
+                        }`}
                       />
+                    </div>
+                    {/* GitHub Avatar Card — shown on the right when verified */}
+                    {githubStatus.valid && githubStatus.avatar && (
+                      <div className="flex flex-col items-center gap-1.5 bg-[#F5F6FD] border border-[#00D3A0]/40 rounded-xl px-3 py-2 min-w-[80px]">
+                        <img
+                          src={githubStatus.avatar}
+                          alt="GitHub Avatar"
+                          className="w-10 h-10 rounded-full border-2 border-[#00D3A0] shadow-sm"
+                        />
+                        <span className="text-[9px] font-mono text-[#0F8F6B] font-semibold flex items-center gap-0.5">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          Verified
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
